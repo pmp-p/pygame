@@ -125,8 +125,8 @@ if sys.version_info[0] < 3:
 STRIPPED=False
 
 # STRIPPED builds don't have developer resources like docs or tests
-
-if "PYGAME_ANDROID" in os.environ:
+import sysconfig
+if sysconfig.get_platform().find('android')>=0 or ("PYGAME_ANDROID" in os.environ):
     # test cases and docs are useless inside an APK
     STRIPPED=True
 
