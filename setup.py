@@ -29,8 +29,9 @@ import sys
 import os
 
 # just import these always and fail early if not present
-import distutils
 from setuptools import setup
+import distutils
+
 
 IS_PYPY = '__pypy__' in sys.builtin_module_names
 
