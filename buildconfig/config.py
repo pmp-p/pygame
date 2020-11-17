@@ -16,6 +16,8 @@ found: true if the dep is available
 cflags: extra compile flags
 """
 
+import sysconfig
+
 try:
     import msysio
 except ImportError:
@@ -209,6 +211,44 @@ def main(auto=False):
         pass
     elif sys.platform == 'darwin':
         additional_platform_setup = open(os.path.join(BASE_PATH, 'buildconfig', "Setup_Darwin.in"), "r").readlines()
+    elif sys.platform == 'linux':
+        if sysconfig.get_platform().find('android')>=0:
+            additional_platform_setup = []
+
+            include = sysconfig.get_config_vars('INCLUDEDIR')[0]
+
+
+            print(f' ================ android [{include}] ===========================')
+            for r in open(os.path.join(BASE_PATH, 'buildconfig', "Setup.Android.SDL2.in"), "r").readlines():
+
+                if r.startswith('SCRAP ='):
+                    additional_platform_setup.append('SCRAP =\n')
+                    additional_platform_setup.append('PORTMIDI =\n')
+                    additional_platform_setup.append('PORTTIME =\n')
+                    open('src_c/pypm.c','w').close()
+                    continue
+
+                if r.startswith('PNG ='):
+                    additional_platform_setup.append(f'PNG = -I{include} -lSDL2\n')
+                    continue
+
+                if r.startswith('JPEG ='):
+                    additional_platform_setup.append(f'JPEG = -I{include} -lSDL2\n')
+                    continue
+
+
+                r = r.replace('{sdl_includes}', f"-I{include}/SDL2")
+                r = r.replace('{sdl_ttf_includes}', f"-I{include}/SDL2")
+                r = r.replace('{sdl_image_includes}', f"-I{include}/SDL2")
+                r = r.replace('{sdl_mixer_includes}', f"-I{include}/SDL2")
+                r = r.replace('{freetype_includes}', f"-I{include}/freetype2")
+                r = r.replace('{jpeg_includes}', f"-I{include}")
+                r = r.replace('{png_includes}','')
+
+                additional_platform_setup.append(r)
+
+        else:
+            additional_platform_setup = open(os.path.join(BASE_PATH, 'buildconfig', "Setup_Unix.in"), "r").readlines()
     else:
         additional_platform_setup = open(os.path.join(BASE_PATH, 'buildconfig', "Setup_Unix.in"), "r").readlines()
 
