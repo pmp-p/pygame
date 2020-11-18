@@ -219,8 +219,9 @@ def main(auto=False):
 
 
             print(f' ================ android [{include}] ===========================')
-            for r in open(os.path.join(BASE_PATH, 'buildconfig', "Setup.Android.SDL2.in"), "r").readlines():
-
+            for r in open(os.path.join(BASE_PATH, 'buildconfig', "Setup_aosp.in"), "r").readlines():
+#                if r.startswith('SDL ='):
+#                    r = r.strip() + ' -lm\n'
                 if r.startswith('SCRAP ='):
                     additional_platform_setup.append('SCRAP =\n')
                     additional_platform_setup.append('PORTMIDI =\n')
